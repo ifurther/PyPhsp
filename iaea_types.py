@@ -14,10 +14,16 @@ PIAEA_I32 = ctypes.POINTER(IAEA_I32)
 IAEA_I64  = ctypes.c_longlong
 PIAEA_I64 = ctypes.POINTER(IAEA_I64)
 
-iaea_file_modes = {
+iaea_file_access_read = {
     'r': IAEA_I32(1),
     'w': IAEA_I32(2),
     'a': IAEA_I32(3)
+}
+
+iaea_file_source_read = {
+    'r': IAEA_I32(0),
+    'w': IAEA_I32(1),
+    'a': IAEA_I32(2)
 }
 
 all_particles = -1

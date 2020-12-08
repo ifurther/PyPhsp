@@ -7,7 +7,7 @@ import iaea_errors
 import iaea_types
 
 
-iaeadll = ctypes.CDLL('IAEA/bin/iaea.dll')
+iaeadll = ctypes.cdll.LoadLibrary('iaea_phsp/libiaea_phsp.so')
 
 
 class IAEAPhaseSpace(object):
@@ -30,16 +30,17 @@ class IAEAPhaseSpace(object):
         self._source_id = iaea_types.IAEA_I32(-1)
         
         try:
-            self.access = iaea_types.iaea_file_modes[mode]
+            self.access = iaea_types.iaea_file_access_read[mode]
+            #self.source_mod = iaea_types.iaea_file_source_read[mod]
         except:
             err_msg = 'Invalid file mode specified: %s' % mode
             raise iaea_errors.IAEAPhaseSpaceSetupError(err_msg)
-        
+
         self._create_source()
     #--------------------------------------------------------------------------
     def _create_source(self):
         result = iaea_types.IAEA_I32(0)
-        iaeadll.iaea_new_source(byref(self._source_id), self.path, byref(self.access),
+        iaeadll.iaea_new_source(byref(self._source_id), ctypes.c_char_p(self.path.encode('utf-8')), byref(self.access),
                                 byref(result), ctypes.c_int(len(self.path)))
 
         if 0 > result.value > iaea_types.max_sources:            
@@ -92,10 +93,10 @@ class IAEAPhaseSpace(object):
         
 
 def main():
-    iaea = IAEAPhaseSpace('IAEA/phsp/test')
+    iaea = IAEAPhaseSpace('./phsp/test')
 
-    print iaea.num_particles('neutron')
-    print iaea.maximum_energy()
+    print(iaea.num_particles('neutron'))
+    print(iaea.maximum_energy())
     
 if __name__ == "__main__":
     main()
